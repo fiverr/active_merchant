@@ -57,7 +57,12 @@ module ActiveMerchant #:nodoc:
           @raw = post.to_s
           for line in @raw.split('&')    
             key, value = *line.scan( %r{^([A-Za-z0-9_.]+)\=(.*)$} ).flatten
-            params[key] = CGI.unescape(value)
+            begin
+              params[key] = CGI.unescape(value)
+            rescue
+              #paypal sometimes sends back hash as the response, which we
+              #can safetly ignore, but it raises an exception on the CGI.unescape
+            end
           end
         end
       end
